@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ employee.name }} - Details{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h3 class="mb-0">{{ employee.name }}</h3>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Email:</strong> {{ employee.email }}</p>
+                <p><strong>Phone:</strong> {{ employee.phone or 'N/A' }}</p>
+                <p><strong>Address:</strong> {{ employee.address or 'N/A' }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Department:</strong> {{ employee.department }}</p>
+                <p><strong>Designation:</strong> {{ employee.designation }}</p>
+                <p><strong>Joined:</strong> {{ employee.date_of_joining }}</p>
+            </div>
+        </div>
+        <hr>
+        <div class="btn-group">
+            <a href="{{ url_for('main.edit_employee', id=employee.id) }}" class="btn btn-secondary">✏️ Edit Details</a>
+            {% set today_record = attendance | selectattr("date", "equalto", today_date) | first %}
+
+            <form action="{{ url_for('main.mark_attendance_web', emp_id=employee.id) }}" method="POST" class="d-inline">
+                {% if not today_record %}
+                <button type="submit" class="btn btn-success ms-2">▶️ Punch In</button>
+                {% elif today_record.in_time and not today_record.out_time %}
+                <button type="submit" class="btn btn-danger ms-2">⏹️ Punch Out</button>
+                {% else %}
+                <button type="button" class="btn btn-secondary ms-2" disabled>✅ Completed</button>
+                {% endif %}
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<h4>Attendance History</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>In Time</th>
+            <th>Out Time</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in attendance %}
+        <tr>
+            <td>{{ record.date }}</td>
+            <td>{{ record.in_time or '-' }}</td>
+            <td>{{ record.out_time or '-' }}</td>
+            <td>
+                <span class="badge bg-success">{{ record.status }}</span>
+                <a href="{{ url_for('main.edit_attendance', att_id=record.id) }}"
+                    class="btn btn-sm btn-outline-secondary ms-2">Edit</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4">No attendance records found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
