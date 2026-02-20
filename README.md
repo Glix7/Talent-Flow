@@ -52,3 +52,5 @@ hrms-project/
 ## 📖 API Documentation
 
 Full API documentation is available at `http://localhost:5001/api` when the server is running.
+
+Checked
